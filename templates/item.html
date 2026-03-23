@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item.name }} - 公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        header {
+            {% if header.image %}
+            background-image: url('{{ url_for('static', filename=header.image) }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            {% endif %}
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .btn.login-btn, .btn.logout-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn.login-btn {
+            background-color: #4CAF50;
+        }
+        
+        .btn.logout-btn {
+            background-color: #f44336;
+        }
+        
+        .btn.login-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .btn.logout-btn:hover {
+            background-color: #da190b;
+        }
+        
+        main {
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台</h1>
+        <p>为青少年新空间贡献一份力量</p>
+        <!-- 用户信息区域 -->
+        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        <section class="item-detail">
+            <div class="back-link">
+                <a href="{{ url_for('index') }}">&larr; 返回主页</a>
+            </div>
+            <div class="item-content">
+                <div class="item-image">
+                    {% if item.image %}
+                    <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                    {% else %}
+                    <div class="no-image">暂无图片</div>
+                    {% endif %}
+                </div>
+                <div class="item-info">
+                    <h2>{{ item.name }}</h2>
+                    <p class="price">价格: ¥{{ item.price }}</p>
+                    {% if item.donated %}
+                    <div class="donated-status">
+                        <span class="status-badge donated">已捐赠</span>
+                        <div class="donor-info">
+                            <h3>捐助人信息</h3>
+                            <div class="donor-details">
+                                {% if item.donor_avatar %}
+                                <img src="{{ url_for('static', filename=item.donor_avatar) }}" alt="{{ item.donor_name }}" class="donor-avatar">
+                                {% else %}
+                                <div class="no-avatar">暂无头像</div>
+                                {% endif %}
+                                <p class="donor-name">{{ item.donor_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="donated-status">
+                        <span class="status-badge not-donated">待捐赠</span>
+                    </div>
+                    {% endif %}
+                    <div class="description">
+                        <h3>物品简介</h3>
+                        <p>{{ item.description }}</p>
+                    </div>
+                    <div class="action-buttons">
+                        {% if not item.donated %}
+                        <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                            <div>
+                                <label for="anonymous-toggle" style="font-size: 16px; color: #333; font-weight: 600; display: block; margin-bottom: 5px;">匿名捐助</label>
+                                <p style="font-size: 12px; color: #666; margin: 0;">选择后将以"好心人"身份进行捐助，不显示个人信息</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="anonymous-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <style>
+                            /* 确保开关容器正确定位 */
+                            .switch {
+                                position: relative;
+                                display: inline-block;
+                                width: 60px;
+                                height: 34px;
+                            }
+                            
+                            /* 隐藏原生checkbox */
+                            .switch input {
+                                opacity: 0;
+                                width: 0;
+                                height: 0;
+                            }
+                            
+                            /* 滑块背景 */
+                            .slider {
+                                position: absolute;
+                                cursor: pointer;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background-color: #ccc;
+                                transition: .4s;
+                                border-radius: 34px;
+                                box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+                            }
+                            
+                            /* 滑块按钮 */
+                            .slider:before {
+                                position: absolute;
+                                content: "";
+                                height: 26px;
+                                width: 26px;
+                                left: 4px;
+                                bottom: 4px;
+                                background-color: white;
+                                transition: .4s;
+                                border-radius: 50%;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                            }
+                            
+                            /* 打开状态 */
+                            input:checked + .slider {
+                                background-color: #4CAF50 !important;
+                                box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 15px rgba(76, 175, 80, 0.7) !important;
+                            }
+                            
+                            /* 打开状态的滑块位置 */
+                            input:checked + .slider:before {
+                                transform: translateX(26px) !important;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 8px rgba(255,255,255,0.9) !important;
+                            }
+                            
+                            /* 聚焦效果 */
+                            input:focus + .slider {
+                                box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 12px rgba(76, 175, 80, 0.8) !important;
+                            }
+                            
+                            /* 悬停效果 */
+                            .switch:hover .slider {
+                                box-shadow: inset 0 2px 4px rgba(0,0,0,0.2), 0 0 8px rgba(0,0,0,0.15) !important;
+                            }
+                        </style>
+                        <button class="btn donate-btn" onclick="wechatPay()">微信支付</button>
+                        {% else %}
+                        <button class="btn donate-btn disabled" disabled>已捐赠</button>
+                        {% endif %}
+                        <button class="btn contact-btn" onclick="showContact()">联系我们</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- 二维码弹窗 -->
+    <div id="qrcode-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeQRCode()">&times;</span>
+            <h3>扫描二维码进行捐助</h3>
+            <img id="qrcode-image" src="{{ url_for('static', filename=item.qrcode) if item.qrcode else '' }}" alt="付款二维码" class="qrcode-image">
+            {% if not item.qrcode %}
+            <p class="no-qrcode">暂未设置付款二维码</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 联系我们弹窗 -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeContact()">&times;</span>
+            <h3>联系我们</h3>
+            {% if contact.image %}
+            <img src="{{ url_for('static', filename=contact.image) }}" alt="联系我们" class="contact-image">
+            {% else %}
+            <p class="no-contact">暂未设置联系信息</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+    
+    <script>
+        // 显示二维码弹窗
+        function showQRCode() {
+            document.getElementById('qrcode-modal').style.display = 'block';
+        }
+        
+        // 关闭二维码弹窗
+        function closeQRCode() {
+            document.getElementById('qrcode-modal').style.display = 'none';
+        }
+        
+        // 显示联系我们弹窗
+        function showContact() {
+            document.getElementById('contact-modal').style.display = 'block';
+        }
+        
+        // 关闭联系我们弹窗
+        function closeContact() {
+            document.getElementById('contact-modal').style.display = 'none';
+        }
+        
+        // 微信支付（模拟）
+        function wechatPay() {
+            // 检查是否登录
+            {% if not session.user %}
+            alert('请先登录后再进行支付');
+            window.location.href = '{{ url_for('login') }}';
+            return;
+            {% endif %}
+            
+            // 获取匿名捐助开关状态
+            var anonymousToggle = document.getElementById('anonymous-toggle');
+            var anonymous = anonymousToggle ? anonymousToggle.checked : false;
+            
+            // 显示加载状态
+            alert('正在准备支付，请稍候...');
+            
+            // 发送请求创建支付订单
+            fetch('/api/create_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    item_id: {{ item.id }},
+                    anonymous: anonymous
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code == 200) {
+                    // 模拟支付，直接提交表单
+                    var form = document.createElement('form');
+                    form.action = '/simulate/pay';
+                    form.method = 'POST';
+                    
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'out_trade_no';
+                    input.value = data.data.prepay_id;
+                    form.appendChild(input);
+                    
+                    var anonymousInput = document.createElement('input');
+                    anonymousInput.type = 'hidden';
+                    anonymousInput.name = 'anonymous';
+                    anonymousInput.value = anonymous ? 'true' : 'false';
+                    form.appendChild(anonymousInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('创建支付订单失败:', error);
+                alert('创建支付订单失败，请稍后重试');
+            });
+        }
+        
+        // 点击弹窗外部关闭
+        window.onclick = function(event) {
+            var qrcodeModal = document.getElementById('qrcode-modal');
+            var contactModal = document.getElementById('contact-modal');
+            if (event.target == qrcodeModal) {
+                qrcodeModal.style.display = 'none';
+            }
+            if (event.target == contactModal) {
+                contactModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

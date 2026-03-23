@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付成功 - 公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .message-form {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        .message-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>公益捐助平台</h1>
+        <p>为需要帮助的人贡献一份力量</p>
+        <div class="user-info">
+            {% if session.user %}
+            <span>欢迎，{{ session.user_name }}</span>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        <div class="success-icon">✓</div>
+        <h2>支付成功！</h2>
+        <p>感谢您的爱心捐助，您的善举将帮助到需要帮助的人。</p>
+        
+        <div class="message-form">
+            <h3>留下您的留言</h3>
+            <form method="post" action="{{ url_for('add_message') }}">
+                <div class="form-group">
+                    <label for="message">留言内容</label>
+                    <textarea id="message" name="message" placeholder="请输入您的留言..."></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn">提交留言</button>
+                    <a href="{{ url_for('index') }}" class="btn">返回主页</a>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 公益捐助平台</p>
+    </footer>
+</body>
+</html>

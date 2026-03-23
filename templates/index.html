@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        header {
+            {% if header.image %}
+            background-image: url('{{ url_for('static', filename=header.image) }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            {% endif %}
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .btn.login-btn, .btn.logout-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn.login-btn {
+            background-color: #4CAF50;
+        }
+        
+        .btn.logout-btn {
+            background-color: #f44336;
+        }
+        
+        .btn.login-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .btn.logout-btn:hover {
+            background-color: #da190b;
+        }
+        
+        main {
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .donations {
+            margin-bottom: 40px;
+        }
+        
+        .donations h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .donation-stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .donation-list h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .donation-items {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .donation-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .donation-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .donor-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .donation-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .donation-item-name {
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .donation-message {
+            font-size: 14px;
+            color: #999;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .no-donations {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
+        
+        .latest-donor {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .latest-donor h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .latest-donor-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .donor-avatar {
+            margin-right: 20px;
+        }
+        
+        .donor-avatar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+        }
+        
+        .donor-details {
+            flex: 1;
+        }
+        
+        .donor-details .donor-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .donor-details .donor-item {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .donor-details .donor-message {
+            font-size: 14px;
+            color: #999;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .donor-avatars {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .donor-avatars:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .donor-avatars h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        /* 桌面端布局 */
+        .avatars-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        
+        .avatars-row {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+        
+        .avatar-item {
+            text-align: center;
+            flex: 0 0 18%; /* 更紧凑的布局 */
+            padding: 0 5px;
+        }
+        
+        .avatar {
+            position: relative;
+            margin-bottom: 4px;
+        }
+        
+        .avatar img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4CAF50;
+            transition: transform 0.3s ease;
+        }
+        
+        .avatar-item:hover .avatar img {
+            transform: scale(1.05);
+        }
+        
+        .avatar-name {
+            font-size: 11px;
+            color: #333;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        .view-all {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+        
+        .no-donors {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            width: 100%;
+        }
+        
+        /* 捐助次数标记 */
+        .donation-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* 手机端布局 */
+        @media (max-width: 768px) {
+            main {
+                padding: 15px;
+            }
+            
+            .donation-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                padding: 10px 0;
+            }
+            
+            .items-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .item-card {
+                margin-bottom: 0;
+            }
+            
+            .avatar-item {
+                flex: 0 0 25%; /* 4个头像一行 */
+                padding: 0 5px;
+            }
+            
+            .avatar img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .avatar-name {
+                font-size: 10px;
+                margin-top: 4px;
+            }
+            
+            .donation-count {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+            }
+            
+            .latest-donor-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .donor-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* 滑动指示器 */
+        .scroll-indicator {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 0 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .indicator-dot.active {
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台</h1>
+        <p>为青少年新空间贡献一份力量</p>
+        <!-- 用户信息区域 -->
+        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        <!-- 爱心捐助 -->
+        <section class="donations">
+            <h2>爱心捐助</h2>
+            <!-- 爱心人士 -->
+            <div class="donor-avatars" onclick="window.location.href='{{ url_for('donations_list') }}'">
+                <h3>爱心人士</h3>
+                {% if sorted_donors %}
+                <div class="avatars-container" id="avatarsContainer">
+                    <div class="avatars-row" id="avatarsRow">
+                        {% for donor_name, donor_info in sorted_donors %}
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="{{ url_for('static', filename=donor_info.avatar if donor_info.avatar else 'images/donor_1.jpg') }}" alt="{{ donor_name }}">
+                                {% if donor_info.count > 1 %}
+                                <div class="donation-count">{{ donor_info.count }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="avatar-name">{{ donor_name }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-donors">暂无捐助记录</div>
+                {% endif %}
+                <div class="view-all">点击查看全部捐助记录</div>
+            </div>
+        </section>
+        
+        <script>
+            // 滑动功能实现
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.getElementById('avatarsContainer');
+                const row = document.getElementById('avatarsRow');
+                
+                if (!container || !row) return;
+                
+                // 设置容器样式，启用滚动
+                container.style.overflowX = 'auto';
+                container.style.overflowY = 'hidden';
+                container.style.whiteSpace = 'nowrap';
+                container.style.scrollBehavior = 'smooth';
+                
+                // 移除默认滚动条
+                container.style::-webkit-scrollbar = 'none';
+                container.style.scrollbarWidth = 'none';
+                
+                // 调整头像项样式，使其在一行显示
+                const avatarItems = row.querySelectorAll('.avatar-item');
+                avatarItems.forEach(item => {
+                    item.style.display = 'inline-block';
+                    item.style.verticalAlign = 'top';
+                });
+                
+                // 触摸滑动优化
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.classList.add('active');
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.classList.remove('active');
+                });
+                
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.classList.remove('active');
+                });
+                
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 3; // 增加滚动速度
+                    container.scrollLeft = scrollLeft - walk;
+                });
+                
+                // 触摸设备支持
+                container.addEventListener('touchstart', (e) => {
+                    isDown = true;
+                    startX = e.touches[0].pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+                
+                container.addEventListener('touchend', () => {
+                    isDown = false;
+                });
+                
+                container.addEventListener('touchmove', (e) => {
+                    if (!isDown) return;
+                    const x = e.touches[0].pageX - container.offsetLeft;
+                    const walk = (x - startX) * 3; // 增加滚动速度
+                    container.scrollLeft = scrollLeft - walk;
+                });
+            });
+        </script>
+        
+        <section class="items">
+            <h2>需要捐助的物品</h2>
+            <div class="items-grid">
+                {% for item in items %}
+                <div class="item-card">
+                    <div class="item-image-container">
+                        {% if item.image %}
+                        <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                        {% else %}
+                        <div class="no-image">暂无图片</div>
+                        {% endif %}
+                        <div class="item-status">
+                            <span class="status-badge {% if item.donated %}donated{% else %}not-donated{% endif %}">
+                                {% if item.donated %}已捐赠{% else %}待捐赠{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <h3>{{ item.name }}</h3>
+                    <p class="price">价格: ¥{{ item.price }}</p>
+                    {% if item.donated %}
+                    <div class="donor-info-card">
+                        <img src="{{ url_for('static', filename=item.donor_avatar if item.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ item.donor_name }}" class="donor-avatar-card">
+                        <p class="donor-name-card">捐助人: {{ item.donor_name }}</p>
+                        {% for donation in donations %}
+                            {% if donation.item_id == item.id and donation.message %}
+                            <p class="donation-message-small">{{ donation.message }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <a href="{{ url_for('item_detail', item_id=item.id) }}" class="btn">查看详情</a>
+                </div>
+                {% endfor %}
+                {% if not items %}
+                <div class="no-items">暂无需要捐助的物品</div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+</body>
+</html>

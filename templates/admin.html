@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 - 公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 折叠面板样式 */
+        .collapse-section {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .collapse-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapse-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .collapse-content {
+            padding: 20px;
+            display: none;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .collapse-section.active .collapse-content {
+            display: block;
+        }
+        
+        .collapse-icon {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapse-section.active .collapse-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            main {
+                padding: 15px;
+            }
+            
+            .collapse-header {
+                padding: 12px;
+            }
+            
+            .collapse-header h2 {
+                font-size: 16px;
+            }
+            
+            .collapse-content {
+                padding: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-row .form-group {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .admin-nav {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .admin-nav a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        /* 通用样式优化 */
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台 - 后台管理</h1>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin_users') }}" style="margin-right: 20px; padding: 8px 16px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px;">进入管理用户</a>
+            <a href="{{ url_for('admin_logout') }}" style="padding: 8px 16px; background-color: #f44336; color: white; text-decoration: none; border-radius: 4px;">退出登录</a>
+        </div>
+    </header>
+    <main>
+        <!-- 添加物品表单 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>添加捐助物品</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <form method="POST" action="{{ url_for('add_item') }}" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">物品名称</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">价格</label>
+                            <input type="number" id="price" name="price" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">物品简介</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="image">物品图片</label>
+                            <input type="file" id="image" name="image" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label for="qrcode">付款二维码</label>
+                            <input type="file" id="qrcode" name="qrcode" accept="image/*">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">添加物品</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 物品管理 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>物品管理</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <!-- 搜索和排序功能 -->
+                <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="item-search" placeholder="搜索物品名称或描述..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    </div>
+                    <div>
+                        <select id="item-sort" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="created-desc">创建时间（最新优先）</option>
+                            <option value="created-asc">创建时间（最早优先）</option>
+                            <option value="name-asc">名称（A-Z）</option>
+                            <option value="name-desc">名称（Z-A）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 分页控件 -->
+                <div style="margin-bottom: 20px; text-align: center;">
+                    <div id="pagination" style="display: inline-block;">
+                        <button id="prev-page" class="btn" style="margin-right: 10px; background-color: #2196F3;">上一页</button>
+                        <span id="page-numbers" style="margin: 0 10px;"></span>
+                        <button id="next-page" class="btn" style="margin-left: 10px; background-color: #2196F3;">下一页</button>
+                        <span style="margin-left: 15px; font-size: 14px; color: #666;">共 <span id="total-items">0</span> 个物品</span>
+                    </div>
+                </div>
+                
+                <div class="items-list" id="items-list">
+                    {% for item in items %}
+                    <div class="item-admin-card" data-name="{{ item.name }}" data-description="{{ item.description }}" data-created="{{ item.created_at if item.created_at else '' }}">
+                        {% if item.created_at %}
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">创建时间: {{ item.created_at }}</div>
+                        {% endif %}
+                        <div class="item-admin-header">
+                            <h3>{{ item.name }}</h3>
+                            <span class="status-badge {% if item.donated %}donated{% else %}not-donated{% endif %}">
+                                {% if item.donated %}已捐赠{% else %}待捐赠{% endif %}
+                            </span>
+                        </div>
+                        <div class="item-admin-info">
+                            <p>价格: ¥{{ item.price }}</p>
+                            <p>{{ item.description[:50] }}...</p>
+                            {% if item.donated %}
+                            <div class="donor-preview">
+                                <p>捐助人: {{ item.donor_name }}</p>
+                                {% if item.donor_avatar %}
+                                <img src="{{ url_for('static', filename=item.donor_avatar) }}" alt="{{ item.donor_name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: contain; background-color: #f0f0f0;">
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="item-admin-actions">
+                            <!-- 编辑物品 -->
+                            <button class="btn edit-btn" onclick="toggleEditForm({{ item.id }})">编辑</button>
+                            {% if not item.donated %}
+                            <button class="btn donate-btn" onclick="toggleDonateForm({{ item.id }})">标记为已捐赠</button>
+                            {% else %}
+                            <a href="{{ url_for('mark_not_donated', item_id=item.id) }}" class="btn not-donate-btn" onclick="return confirm('确定要标记为未捐赠吗？')">标记为未捐赠</a>
+                            {% endif %}
+                            <a href="{{ url_for('delete_item', item_id=item.id) }}" class="btn delete-btn" onclick="return confirm('确定要删除这个物品吗？')">删除</a>
+                        </div>
+                        
+                        <!-- 编辑表单 -->
+                        <div id="edit-form-{{ item.id }}" class="edit-form" style="display: none;">
+                            <form method="POST" action="{{ url_for('edit_item', item_id=item.id) }}" enctype="multipart/form-data">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-name-{{ item.id }}">物品名称</label>
+                                        <input type="text" id="edit-name-{{ item.id }}" name="name" value="{{ item.name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-price-{{ item.id }}">价格</label>
+                                        <input type="number" id="edit-price-{{ item.id }}" name="price" step="0.01" value="{{ item.price }}" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-description-{{ item.id }}">物品简介</label>
+                                    <textarea id="edit-description-{{ item.id }}" name="description" required>{{ item.description }}</textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-image-{{ item.id }}">物品图片</label>
+                                        <input type="file" id="edit-image-{{ item.id }}" name="image" accept="image/*">
+                                        {% if item.image %}
+                                        <p class="current-image">当前图片: <img src="{{ url_for('static', filename=item.image) }}" alt="当前图片" style="width: 100px;"></p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-qrcode-{{ item.id }}">付款二维码</label>
+                                        <input type="file" id="edit-qrcode-{{ item.id }}" name="qrcode" accept="image/*">
+                                        {% if item.qrcode %}
+                                        <p class="current-image">当前二维码: <img src="{{ url_for('static', filename=item.qrcode) }}" alt="当前二维码" style="width: 100px;"></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn">保存修改</button>
+                                <button type="button" class="btn cancel-btn" onclick="toggleEditForm({{ item.id }})">取消</button>
+                            </form>
+                        </div>
+                        
+                        <!-- 标记为已捐赠表单 -->
+                        <div id="donate-form-{{ item.id }}" class="donate-form" style="display: none;">
+                            <form method="POST" action="{{ url_for('mark_donated', item_id=item.id) }}" enctype="multipart/form-data">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="donor-name-{{ item.id }}">捐助人姓名</label>
+                                        <input type="text" id="donor-name-{{ item.id }}" name="donor_name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="donor-avatar-{{ item.id }}">捐助人头像</label>
+                                        <input type="file" id="donor-avatar-{{ item.id }}" name="donor_avatar" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="donation-time-{{ item.id }}">捐赠时间</label>
+                                    <input type="datetime-local" id="donation-time-{{ item.id }}" name="donation_time" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="donation-message-{{ item.id }}">留言内容</label>
+                                    <textarea id="donation-message-{{ item.id }}" name="message" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn">确认捐赠</button>
+                                <button type="button" class="btn cancel-btn" onclick="toggleDonateForm({{ item.id }})">取消</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if not items %}
+                    <div class="no-items">暂无物品</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 联系我们设置 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>联系我们设置</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <form method="POST" action="{{ url_for('update_contact') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="contact-image">联系我们图片</label>
+                        <input type="file" id="contact-image" name="image" accept="image/*">
+                        {% if contact.image %}
+                        <p class="current-image">当前图片: <img src="{{ url_for('static', filename=contact.image) }}" alt="当前联系图片" style="width: 100px;"></p>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新联系我们</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 捐助记录管理 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>捐助记录管理</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <div class="donations-list">
+                    {% if donations %}
+                        {% for donation in donations %}
+                        <div class="donation-admin-card">
+                            <div class="donation-admin-header">
+                                <h3>{{ donation.donor_name }}</h3>
+                                <span class="donation-time">{{ donation.donation_time }}</span>
+                            </div>
+                            <div class="donation-admin-info">
+                                <p>捐助物品: {{ donation.item_name }}</p>
+                                {% if donation.donor_avatar %}
+                                <img src="{{ url_for('static', filename=donation.donor_avatar) }}" alt="{{ donation.donor_name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin: 10px 0;">
+                                {% endif %}
+                                {% if donation.message %}
+                                <div class="donation-message">
+                                    <p>留言: {{ donation.message }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="donation-admin-actions">
+                                <button class="btn edit-btn" onclick="toggleDonationEditForm({{ donation.id }})">编辑信息</button>
+                                <a href="{{ url_for('delete_donation', donation_id=donation.id) }}" class="btn delete-btn" onclick="return confirm('确定要删除这条捐助记录吗？删除后将同时清除该记录对应的物品募捐状态。')">删除记录</a>
+                            </div>
+                            
+                            <!-- 编辑捐助记录表单 -->
+                            <div id="donation-edit-form-{{ donation.id }}" class="donation-edit-form" style="display: none;">
+                                <form method="POST" action="{{ url_for('edit_donation_message', donation_id=donation.id) }}" enctype="multipart/form-data">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="donor-name-{{ donation.id }}">捐助人姓名</label>
+                                            <input type="text" id="donor-name-{{ donation.id }}" name="donor_name" value="{{ donation.donor_name }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="donor-avatar-{{ donation.id }}">捐助人头像</label>
+                                            <input type="file" id="donor-avatar-{{ donation.id }}" name="donor_avatar" accept="image/*">
+                                            {% if donation.donor_avatar %}
+                                            <p class="current-image">当前头像: <img src="{{ url_for('static', filename=donation.donor_avatar) }}" alt="当前头像" style="width: 50px; height: 50px; border-radius: 50%;"></p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="donation-message-{{ donation.id }}">留言内容</label>
+                                        <textarea id="donation-message-{{ donation.id }}" name="message">{{ donation.message }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-select-{{ donation.id }}">关联用户</label>
+                                        <select id="user-select-{{ donation.id }}" name="user_id">
+                                            <option value="">选择用户</option>
+                                            {% for username, user_info in users.items() %}
+                                            <option value="{{ username }}" {% if donation.donor_name == user_info.name %}selected{% endif %}>{{ user_info.name }} ({{ username }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn">保存修改</button>
+                                    <button type="button" class="btn cancel-btn" onclick="toggleDonationEditForm({{ donation.id }})">取消</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="no-donations">暂无捐助记录</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 头部图片设置 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>主页头部图片设置</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <form method="POST" action="{{ url_for('update_header') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="header-image">头部图片</label>
+                        <input type="file" id="header-image" name="image" accept="image/*">
+                        {% if header.image %}
+                        <p class="current-image">当前图片: <img src="{{ url_for('static', filename=header.image) }}" alt="当前头部图片" style="width: 200px;"></p>
+                        {% else %}
+                        <p class="no-image-text">暂无头部图片</p>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新头部图片</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 默认头像设置 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse(this)">
+                <h2>默认头像设置</h2>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapse-content">
+                <form method="POST" action="{{ url_for('update_default_avatar') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="default-avatar">默认头像</label>
+                        <input type="file" id="default-avatar" name="default_avatar" accept="image/*">
+                        {% if settings.default_avatar %}
+                        <p class="current-image">当前默认头像: <img src="{{ url_for('static', filename=settings.default_avatar) }}" alt="当前默认头像" style="width: 100px; height: 100px; border-radius: 50%;"></p>
+                        {% else %}
+                        <p class="no-image-text">暂无默认头像</p>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新默认头像</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+    <script>
+        // 保存当前活动的栏目到 localStorage
+        function saveActiveSection() {
+            const sections = document.querySelectorAll('.collapse-section');
+            sections.forEach((section, index) => {
+                if (section.classList.contains('active')) {
+                    localStorage.setItem('adminActiveSection', index.toString());
+                }
+            });
+        }
+        
+        // 恢复当前活动的栏目
+        function loadActiveSection() {
+            const savedIndex = localStorage.getItem('adminActiveSection');
+            if (savedIndex !== null) {
+                const sections = document.querySelectorAll('.collapse-section');
+                sections.forEach((section, index) => {
+                    if (index.toString() === savedIndex) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        function toggleCollapse(element) {
+            var section = element.parentElement;
+            var sections = document.querySelectorAll('.collapse-section');
+            
+            // 只保持当前点击的栏目为展开状态
+            sections.forEach(s => {
+                s.classList.remove('active');
+            });
+            section.classList.add('active');
+            
+            // 保存当前活动的栏目
+            saveActiveSection();
+        }
+        
+        function toggleEditForm(itemId) {
+            var form = document.getElementById('edit-form-' + itemId);
+            var donateForm = document.getElementById('donate-form-' + itemId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                if (donateForm) {
+                    donateForm.style.display = 'none';
+                }
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        function toggleDonateForm(itemId) {
+            var form = document.getElementById('donate-form-' + itemId);
+            var editForm = document.getElementById('edit-form-' + itemId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                if (editForm) {
+                    editForm.style.display = 'none';
+                }
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        function toggleDonationEditForm(donationId) {
+            var form = document.getElementById('donation-edit-form-' + donationId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        // 页面加载时恢复当前活动的栏目
+        document.addEventListener('DOMContentLoaded', function() {
+            loadActiveSection();
+            initItemSearchAndSort();
+        });
+        
+        // 分页功能
+        let currentPage = 1;
+        const itemsPerPage = 7;
+        let filteredItems = [];
+        
+        // 初始化物品搜索和排序
+        function initItemSearchAndSort() {
+            const searchInput = document.getElementById('item-search');
+            const sortSelect = document.getElementById('item-sort');
+            const itemsList = document.getElementById('items-list');
+            const itemCards = Array.from(document.querySelectorAll('.item-admin-card'));
+            
+            if (!searchInput || !sortSelect || !itemsList) return;
+            
+            // 初始化过滤后的物品
+            filteredItems = [...itemCards];
+            updateTotalItems();
+            renderPagination();
+            goToPage(1);
+            
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                filteredItems = itemCards.filter(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const description = card.dataset.description.toLowerCase();
+                    return name.includes(searchTerm) || description.includes(searchTerm);
+                });
+                
+                updateTotalItems();
+                currentPage = 1;
+                renderPagination();
+                goToPage(1);
+            });
+            
+            // 排序功能
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                
+                filteredItems.sort((a, b) => {
+                    switch(sortValue) {
+                        case 'created-desc':
+                            return new Date(b.dataset.created || '1970-01-01') - new Date(a.dataset.created || '1970-01-01');
+                        case 'created-asc':
+                            return new Date(a.dataset.created || '1970-01-01') - new Date(b.dataset.created || '1970-01-01');
+                        case 'name-asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case 'name-desc':
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        default:
+                            return 0;
+                    }
+                });
+                
+                currentPage = 1;
+                renderPagination();
+                goToPage(1);
+            });
+            
+            // 上一页按钮
+            document.getElementById('prev-page').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    goToPage(currentPage - 1);
+                }
+            });
+            
+            // 下一页按钮
+            document.getElementById('next-page').addEventListener('click', function() {
+                const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    goToPage(currentPage + 1);
+                }
+            });
+        }
+        
+        // 更新总物品数
+        function updateTotalItems() {
+            document.getElementById('total-items').textContent = filteredItems.length;
+        }
+        
+        // 渲染分页控件
+        function renderPagination() {
+            const pageNumbers = document.getElementById('page-numbers');
+            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+            
+            pageNumbers.innerHTML = '';
+            
+            // 显示页码
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('button');
+                pageLink.textContent = i;
+                pageLink.style.margin = '0 3px';
+                pageLink.style.padding = '4px 10px';
+                pageLink.style.border = '1px solid #ddd';
+                pageLink.style.borderRadius = '4px';
+                pageLink.style.background = i === currentPage ? '#4CAF50' : 'white';
+                pageLink.style.color = i === currentPage ? 'white' : '#333';
+                pageLink.style.cursor = 'pointer';
+                pageLink.style.fontSize = '14px';
+                
+                pageLink.addEventListener('click', function() {
+                    goToPage(i);
+                });
+                
+                pageNumbers.appendChild(pageLink);
+            }
+            
+            // 禁用/启用上一页/下一页按钮
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+        }
+        
+        // 跳转到指定页
+        function goToPage(page) {
+            currentPage = page;
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            
+            // 隐藏所有卡片
+            document.querySelectorAll('.item-admin-card').forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // 显示当前页的卡片
+            filteredItems.slice(startIndex, endIndex).forEach(card => {
+                card.style.display = 'block';
+            });
+            
+            // 更新分页控件
+            renderPagination();
+        }
+    </script>
+</body>
+</html>

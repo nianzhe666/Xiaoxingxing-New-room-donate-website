@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人设置 - 公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        header {
+            {% if header.image %}
+            background-image: url('{{ url_for('static', filename=header.image) }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            {% endif %}
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .btn.login-btn, .btn.logout-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn.login-btn {
+            background-color: #4CAF50;
+        }
+        
+        .btn.logout-btn {
+            background-color: #f44336;
+        }
+        
+        .btn.login-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .btn.logout-btn:hover {
+            background-color: #da190b;
+        }
+        
+        main {
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .settings-section {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .settings-section h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .back-link {
+            margin-bottom: 20px;
+        }
+        
+        .back-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .avatar-setting {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .current-avatar {
+            margin-bottom: 20px;
+        }
+        
+        .current-avatar img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+        }
+        
+        .avatar-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台</h1>
+        <p>为青少年新空间贡献一份力量</p>
+        <!-- 用户信息区域 -->
+        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        <section class="settings-section">
+            <div class="back-link">
+                <a href="{{ url_for('index') }}">&larr; 返回主页</a>
+            </div>
+            <h2>个人设置</h2>
+            <div class="avatar-setting">
+                <h3>头像设置</h3>
+                <div class="current-avatar">
+                    <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.get('user_name', '用户') }}">
+                </div>
+                <form class="avatar-form" method="post" action="{{ url_for('update_avatar') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="avatar">选择新头像</label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn">更新头像</button>
+                </form>
+            </div>
+            
+            <div class="name-setting" style="margin-top: 40px;">
+                <h3>名字设置</h3>
+                <form class="name-form" method="post" action="{{ url_for('update_name') }}" style="max-width: 400px; margin: 0 auto;">
+                    <div class="form-group">
+                        <label for="name">新名字</label>
+                        <input type="text" id="name" name="name" value="{{ session.get('user_name', '') }}" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+                    </div>
+                    <button type="submit" class="btn">更新名字</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+</body>
+</html>
