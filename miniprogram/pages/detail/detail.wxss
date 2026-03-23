@@ -1,0 +1,83 @@
+.description-section {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.description-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30rpx;
+}
+
+.action-buttons .btn {
+  flex: 1;
+  margin: 0 10rpx;
+}
+
+.btn-secondary {
+  background-color: #9e9e9e;
+  color: #fff;
+}
+
+/* 弹窗样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 30rpx;
+  width: 80%;
+  max-width: 500rpx;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.contact-image {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.no-contact {
+  text-align: center;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.modal-btn {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 10rpx;
+  font-size: 32rpx;
+  background-color: #4CAF50;
+  color: #fff;
+  margin-top: 20rpx;
+}
