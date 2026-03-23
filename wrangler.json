@@ -1,1 +1,5 @@
-{"name": "xiaoxingxing-new-room-donate-website",", "compatibility_date": "2026-03-23", "main": "app.py", "assets": {"directory": "static/images"}}
+{
+  "name": "xiaoxingxing-new-room-donate-website",
+  "compatibility_date": "2026-03-23",
+  "main": "src/index.js"  // 最后一行不要加逗号
+}
