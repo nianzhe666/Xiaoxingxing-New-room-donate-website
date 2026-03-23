@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理用户 - 公益捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        header {
+            {% if header.image %}
+            background-image: url('{{ url_for('static', filename=header.image) }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            {% endif %}
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .btn.login-btn, .btn.logout-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn.login-btn {
+            background-color: #4CAF50;
+        }
+        
+        .btn.logout-btn {
+            background-color: #f44336;
+        }
+        
+        .btn.login-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .btn.logout-btn:hover {
+            background-color: #da190b;
+        }
+        
+        main {
+            border-radius: 8px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-section {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .admin-section h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .back-link {
+            margin-bottom: 20px;
+        }
+        
+        .back-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .users-list {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .users-list h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .user-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            flex-shrink: 0;
+        }
+        
+        .user-avatar img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-username {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #da190b;
+        }
+        
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1976D2;
+        }
+        
+        .add-user {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .add-user h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台</h1>
+        <p>为青少年新空间贡献一份力量</p>
+        <div class="user-info">
+            {% if session.admin %}
+            <span>管理员</span>
+            <a href="{{ url_for('admin_logout') }}" class="btn logout-btn">登出</a>
+            {% else %}
+            <a href="{{ url_for('admin') }}" class="btn login-btn">登录</a>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        <section class="admin-section">
+            <div class="back-link">
+                <a href="{{ url_for('admin_panel') }}">&larr; 返回管理面板</a>
+            </div>
+            <h2>管理用户</h2>
+            
+            <!-- 用户列表 -->
+            <div class="users-list">
+                <h3>用户列表</h3>
+                {% if users %}
+                    {% for username, user_info in users.items() %}
+                    <div class="user-item">
+                        <div class="user-avatar">
+                            <img src="{{ url_for('static', filename=user_info.avatar if user_info.avatar else 'images/donor_1.jpg') }}" alt="{{ user_info.name }}">
+                        </div>
+                        <div class="user-details">
+                            <div class="user-username">用户名: {{ username }}</div>
+                            <div class="user-name">姓名: {{ user_info.name }}</div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn btn-secondary" onclick="document.getElementById('edit-form-{{ username }}').style.display = 'block'">编辑</button>
+                            <a href="{{ url_for('delete_user', username=username) }}" class="btn btn-danger" onclick="return confirm('确定要删除用户 {{ username }} 吗？')">删除</a>
+                        </div>
+                    </div>
+                    
+                    <!-- 编辑用户表单 -->
+                    <div id="edit-form-{{ username }}" style="display: none; background-color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                        <h4>编辑用户: {{ username }}</h4>
+                        <form method="post" action="{{ url_for('edit_user', username=username) }}" enctype="multipart/form-data">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="username-{{ username }}">用户名</label>
+                                    <input type="text" id="username-{{ username }}" name="new_username" value="{{ username }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password-{{ username }}">密码 (留空表示不修改)</label>
+                                    <input type="password" id="password-{{ username }}" name="password">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name-{{ username }}">姓名</label>
+                                    <input type="text" id="name-{{ username }}" name="name" value="{{ user_info.name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="avatar-{{ username }}">头像</label>
+                                    <input type="file" id="avatar-{{ username }}" name="avatar" accept="image/*">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-form-{{ username }}').style.display = 'none'">取消</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; color: #999; padding: 30px;">暂无用户</div>
+                {% endif %}
+            </div>
+            
+            <!-- 添加用户 -->
+            <div class="add-user">
+                <h3>添加用户</h3>
+                <form method="post" action="{{ url_for('add_user') }}">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username">用户名</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">密码</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="name">姓名</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加用户</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+</body>
+</html>

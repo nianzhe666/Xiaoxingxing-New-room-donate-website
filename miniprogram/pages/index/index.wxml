@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="section">
+    <text class="section-title">需要捐助的物品</text>
+    
+    <view wx:if="{{ items.length > 0 }}">
+      <view wx:for="{{ items }}" wx:key="{{ item.id }}" class="card">
+        <image wx:if="{{ item.image }}" src="{{ item.image }}" class="image"></image>
+        <view wx:else class="no-image">暂无图片</view>
+        
+        <view class="status-badge {{ item.donated ? 'donated' : 'not-donated' }}">
+          {{ item.donated ? '已捐赠' : '待捐赠' }}
+        </view>
+        
+        <text class="title">{{ item.name }}</text>
+        <text class="price">价格: ¥{{ item.price }}</text>
+        
+        <view wx:if="{{ item.donated }}" class="donor-info">
+          <image wx:if="{{ item.donor_avatar }}" src="{{ item.donor_avatar }}" class="donor-avatar"></image>
+          <text class="donor-name">捐助人: {{ item.donor_name }}</text>
+        </view>
+        
+        <navigator url="../detail/detail?id={{ item.id }}" class="btn btn-primary">查看详情</navigator>
+      </view>
+    </view>
+    
+    <view wx:else class="empty">
+      <text>暂无需要捐助的物品</text>
+    </view>
+  </view>
+</view>

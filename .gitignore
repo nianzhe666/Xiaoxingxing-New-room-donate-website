@@ -1,0 +1,14 @@
+# 依赖包
+__pycache__/
+*.pyc
+
+# 环境变量文件
+.env
+
+# 数据文件（可选，根据需要决定是否忽略）
+# *.json
+
+# 上传的图片
+static/images/*
+!static/images/donor_1.jpg
+!static/images/anonymous_avatar.jpg
