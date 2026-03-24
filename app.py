@@ -616,11 +616,11 @@ def create_payment():
     item_id = data.get('item_id')
     
     items = load_items()
-    item = next((item for item in items if item['id'] == item_id), None)
+    item = next((item for item in items if item.id == item_id), None)
     if not item:
         return jsonify({'code': 404, 'message': '物品不存在'})
     
-    if item.get('donated'):
+    if item.donated:
         return jsonify({'code': 400, 'message': '物品已被捐赠'})
     
     # 生成订单号

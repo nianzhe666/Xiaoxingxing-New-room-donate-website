@@ -2,8 +2,9 @@ name = "xiaoxingxing-donate-website"
 type = "pages"
 
 [build]
-command = ""
+command = "pip install -r requirements.txt"
 directory = "."
+pages_build_output_dir = "."
 
 [dev]
 command = ""
