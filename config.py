@@ -23,3 +23,9 @@ MINIPROGRAM_CONFIG = {
     # 小程序AppSecret
     'appsecret': 'your_miniprogram_appsecret'
 }
+
+# 数据库配置
+DATABASE_CONFIG = {
+    'SQLALCHEMY_DATABASE_URI': 'sqlite:///donate_website.db',
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False
+}

@@ -2,13 +2,12 @@ name = "xiaoxingxing-donate-website"
 type = "pages"
 
 [build]
-command = "pip install -r requirements.txt && gunicorn app:app"
+command = "pip install -r requirements.txt"
 directory = "."
 
 [dev]
-command = "python app.py"
+command = ""
 
 [env.production]
 SECRET_KEY = "your-secret-key-here"
 FLASK_ENV = "production"
-PORT = "8080"
