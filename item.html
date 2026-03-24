@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>物品详情 - 小行星青少年新空间捐助平台</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <title>{{ item.name }} - 小行星青少年新空间捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .item-detail {
             max-width: 800px;
@@ -175,19 +175,35 @@
     <header>
         <h1>小行星青少年新空间捐助平台</h1>
         <p>为青少年新空间贡献一份力量</p>
+        <!-- 用户信息区域 -->
+        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
+        </div>
     </header>
     <main>
         <div class="item-detail">
             <h2>物品详情</h2>
             <div class="item-info">
                 <div class="item-image">
-                    <img src="static/images/donor_1.jpg" alt="书包">
+                    {% if item.image %}
+                    <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                    {% else %}
+                    <div class="no-image">暂无图片</div>
+                    {% endif %}
                 </div>
                 <div class="item-details">
-                    <h3>书包</h3>
-                    <p>描述: 优质耐用的双肩书包，适合小学生使用，有多个隔层，容量大，背负舒适。</p>
-                    <p>价格: ¥100</p>
-                    <div class="price">¥100</div>
+                    <h3>{{ item.name }}</h3>
+                    <p>{{ item.description }}</p>
+                    <p>价格: ¥{{ item.price }}</p>
+                    <div class="price">¥{{ item.price }}</div>
+                    {% if not item.donated %}
                     <div class="anonymous-toggle">
                         <label>
                             匿名捐助
@@ -195,14 +211,58 @@
                             <span class="toggle-switch"></span>
                         </label>
                     </div>
-                    <button class="btn">微信支付</button>
-                    <a href="index.html" class="btn" style="background-color: #f44336;">返回</a>
+                    <button class="btn" onclick="pay()">微信支付</button>
+                    {% endif %}
+                    <a href="{{ url_for('index') }}" class="btn" style="background-color: #f44336;">返回</a>
                 </div>
             </div>
+            {% if item.donated %}
+            <div class="donor-info">
+                <h3>捐助信息</h3>
+                <div class="donor-details">
+                    <div class="donor-avatar">
+                        <img src="{{ url_for('static', filename=item.donor_avatar if item.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ item.donor_name }}">
+                    </div>
+                    <div class="donor-info">
+                        <div class="donor-name">捐助人: {{ item.donor_name }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </main>
     <footer>
         <p>&copy; 2026 小行星</p>
     </footer>
+    <script>
+        function pay() {
+            const anonymous = document.getElementById('anonymous').checked;
+            
+            // 模拟创建支付订单
+            fetch('/api/create_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    item_id: {{ item.id }},
+                    anonymous: anonymous
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code === 200) {
+                    // 模拟支付
+                    window.location.href = `/simulate/pay?out_trade_no=${data.data.prepay_id}&anonymous=${anonymous}`;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('支付失败，请重试');
+            });
+        }
+    </script>
 </body>
 </html>

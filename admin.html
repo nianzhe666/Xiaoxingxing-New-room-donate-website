@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理 - 小行星青少年新空间捐助平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-nav {
+            margin-top: 10px;
+        }
+        
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        
+        .admin-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .item-admin-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+        }
+        
+        .item-admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .item-admin-header h3 {
+            margin: 0;
+            flex: 1;
+        }
+        
+        .item-admin-info {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .donor-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .donate-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .edit-btn {
+            background-color: #2196F3;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+        }
+        
+        .cancel-btn {
+            background-color: #9e9e9e;
+        }
+        
+        .not-donate-btn {
+            background-color: #ff9800;
+        }
+        
+        .edit-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .current-image {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .no-image-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        /* 图片预览区域 */
+        .image-preview {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 400px;
+        }
+        
+        /* 折叠面板 */
+        .collapse-section {
+            margin-bottom: 20px;
+        }
+        
+        .collapse-header {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .collapse-header:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .collapse-content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: none;
+        }
+        
+        .collapse-content.active {
+            display: block;
+        }
+        
+        .collapse-icon {
+            transition: transform 0.3s;
+        }
+        
+        .collapse-icon.active {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台 - 后台管理</h1>
+        <p>为青少年新空间贡献一份力量</p>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin_users') }}">管理用户</a>
+            <a href="{{ url_for('admin_logout') }}">退出登录</a>
+        </div>
+    </header>
+    <main>
+        <!-- 物品管理 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse('items')">
+                <h2>物品管理</h2>
+                <span class="collapse-icon" id="items-icon">▼</span>
+            </div>
+            <div class="collapse-content" id="items-content">
+                <!-- 添加物品 -->
+                <h3>添加物品</h3>
+                <form action="{{ url_for('add_item') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">物品名称</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">物品描述</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">价格</label>
+                        <input type="number" id="price" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">物品图片</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="qrcode">支付二维码</label>
+                        <input type="file" id="qrcode" name="qrcode" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn">添加物品</button>
+                </form>
+                
+                <!-- 物品列表 -->
+                <h3>物品列表</h3>
+                <div class="items-list">
+                    {% for item in items %}
+                    <div class="item-admin-card">
+                        <div class="item-admin-header">
+                            <h3>{{ item.name }}</h3>
+                            <div class="item-admin-actions">
+                                <button class="btn edit-btn" onclick="toggleEditForm({{ item.id }})">编辑</button>
+                                <a href="{{ url_for('delete_item', item_id=item.id) }}" class="btn delete-btn" onclick="return confirm('确定要删除这个物品吗？')">删除</a>
+                                {% if item.donated %}
+                                <a href="{{ url_for('mark_not_donated', item_id=item.id) }}" class="btn not-donate-btn">标记为未捐赠</a>
+                                {% else %}
+                                <button class="btn" onclick="toggleDonateForm({{ item.id }})">标记为已捐赠</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="item-admin-info">
+                            <p><strong>描述:</strong> {{ item.description }}</p>
+                            <p><strong>价格:</strong> ¥{{ item.price }}</p>
+                            {% if item.image %}
+                            <p><strong>图片:</strong> <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" style="max-width: 100px;"></p>
+                            {% else %}
+                            <p><strong>图片:</strong> 暂无图片</p>
+                            {% endif %}
+                            {% if item.qrcode %}
+                            <p><strong>二维码:</strong> <img src="{{ url_for('static', filename=item.qrcode) }}" alt="支付二维码" style="max-width: 100px;"></p>
+                            {% else %}
+                            <p><strong>二维码:</strong> 暂无二维码</p>
+                            {% endif %}
+                            {% if item.donated %}
+                            <div class="donor-preview">
+                                <img src="{{ url_for('static', filename=item.donor_avatar if item.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ item.donor_name }}" style="width: 40px; height: 40px; border-radius: 50%;">
+                                <div>
+                                    <strong>捐助人:</strong> {{ item.donor_name }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 编辑表单 -->
+                        <div class="edit-form" id="edit-form-{{ item.id }}" style="display: none;">
+                            <h4>编辑物品</h4>
+                            <form action="{{ url_for('edit_item', item_id=item.id) }}" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="edit-name-{{ item.id }}">物品名称</label>
+                                    <input type="text" id="edit-name-{{ item.id }}" name="name" value="{{ item.name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-description-{{ item.id }}">物品描述</label>
+                                    <textarea id="edit-description-{{ item.id }}" name="description" required>{{ item.description }}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-price-{{ item.id }}">价格</label>
+                                    <input type="number" id="edit-price-{{ item.id }}" name="price" step="0.01" value="{{ item.price }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-image-{{ item.id }}">物品图片</label>
+                                    <input type="file" id="edit-image-{{ item.id }}" name="image" accept="image/*">
+                                    {% if item.image %}
+                                    <div class="current-image">当前图片: <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" style="max-width: 100px;"></div>
+                                    {% else %}
+                                    <div class="no-image-text">暂无图片</div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-qrcode-{{ item.id }}">支付二维码</label>
+                                    <input type="file" id="edit-qrcode-{{ item.id }}" name="qrcode" accept="image/*">
+                                    {% if item.qrcode %}
+                                    <div class="current-image">当前二维码: <img src="{{ url_for('static', filename=item.qrcode) }}" alt="支付二维码" style="max-width: 100px;"></div>
+                                    {% else %}
+                                    <div class="no-image-text">暂无二维码</div>
+                                    {% endif %}
+                                </div>
+                                <button type="submit" class="btn">保存修改</button>
+                                <button type="button" class="btn cancel-btn" onclick="toggleEditForm({{ item.id }})")">取消</button>
+                            </form>
+                        </div>
+                        
+                        <!-- 标记为已捐赠表单 -->
+                        <div class="donate-form" id="donate-form-{{ item.id }}" style="display: none;">
+                            <h4>标记为已捐赠</h4>
+                            <form action="{{ url_for('mark_donated', item_id=item.id) }}" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="donor-name-{{ item.id }}">捐助人姓名</label>
+                                    <input type="text" id="donor-name-{{ item.id }}" name="donor_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="donor-avatar-{{ item.id }}">捐助人头像</label>
+                                    <input type="file" id="donor-avatar-{{ item.id }}" name="donor_avatar" accept="image/*">
+                                </div>
+                                <div class="form-group">
+                                    <label for="donation-time-{{ item.id }}">捐赠时间</label>
+                                    <input type="datetime-local" id="donation-time-{{ item.id }}" name="donation_time">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-{{ item.id }}">留言</label>
+                                    <textarea id="message-{{ item.id }}" name="message"></textarea>
+                                </div>
+                                <button type="submit" class="btn">标记为已捐赠</button>
+                                <button type="button" class="btn cancel-btn" onclick="toggleDonateForm({{ item.id }})")">取消</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 捐助记录管理 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse('donations')">
+                <h2>捐助记录管理</h2>
+                <span class="collapse-icon" id="donations-icon">▼</span>
+            </div>
+            <div class="collapse-content" id="donations-content">
+                <h3>捐助记录列表</h3>
+                <div class="items-list">
+                    {% for donation in donations %}
+                    <div class="item-admin-card">
+                        <div class="item-admin-header">
+                            <h3>{{ donation.item_name }}</h3>
+                            <div class="item-admin-actions">
+                                <button class="btn edit-btn" onclick="toggleDonationEditForm({{ donation.id }})">编辑</button>
+                                <a href="{{ url_for('delete_donation', donation_id=donation.id) }}" class="btn delete-btn" onclick="return confirm('确定要删除这个捐助记录吗？')">删除</a>
+                            </div>
+                        </div>
+                        <div class="item-admin-info">
+                            <div class="donor-preview">
+                                <img src="{{ url_for('static', filename=donation.donor_avatar if donation.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ donation.donor_name }}" style="width: 40px; height: 40px; border-radius: 50%;">
+                                <div>
+                                    <strong>捐助人:</strong> {{ donation.donor_name }}<br>
+                                    <strong>捐助时间:</strong> {{ donation.donation_time }}
+                                </div>
+                            </div>
+                            {% if donation.message %}
+                            <p><strong>留言:</strong> {{ donation.message }}</p>
+                            {% else %}
+                            <p><strong>留言:</strong> 暂无留言</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 编辑捐助记录表单 -->
+                        <div class="edit-form" id="donation-edit-form-{{ donation.id }}" style="display: none;">
+                            <h4>编辑捐助记录</h4>
+                            <form action="{{ url_for('edit_donation_message', donation_id=donation.id) }}" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="donation-donor-name-{{ donation.id }}">捐助人姓名</label>
+                                    <input type="text" id="donation-donor-name-{{ donation.id }}" name="donor_name" value="{{ donation.donor_name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="donation-donor-avatar-{{ donation.id }}">捐助人头像</label>
+                                    <input type="file" id="donation-donor-avatar-{{ donation.id }}" name="donor_avatar" accept="image/*">
+                                    {% if donation.donor_avatar %}
+                                    <div class="current-image">当前头像: <img src="{{ url_for('static', filename=donation.donor_avatar) }}" alt="{{ donation.donor_name }}" style="max-width: 100px;"></div>
+                                    {% else %}
+                                    <div class="no-image-text">暂无头像</div>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="donation-message-{{ donation.id }}">留言</label>
+                                    <textarea id="donation-message-{{ donation.id }}" name="message">{{ donation.message }}</textarea>
+                                </div>
+                                <button type="submit" class="btn">保存修改</button>
+                                <button type="button" class="btn cancel-btn" onclick="toggleDonationEditForm({{ donation.id }})")">取消</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 联系我们 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse('contact')">
+                <h2>联系我们</h2>
+                <span class="collapse-icon" id="contact-icon">▼</span>
+            </div>
+            <div class="collapse-content" id="contact-content">
+                <form action="{{ url_for('update_contact') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="contact-image">联系我们图片</label>
+                        <input type="file" id="contact-image" name="image" accept="image/*">
+                        {% if contact.image %}
+                        <div class="current-image">当前图片: <img src="{{ url_for('static', filename=contact.image) }}" alt="联系我们" style="max-width: 100px;"></div>
+                        {% else %}
+                        <div class="no-image-text">暂无图片</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新联系我们</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 头部图片 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse('header')">
+                <h2>头部图片</h2>
+                <span class="collapse-icon" id="header-icon">▼</span>
+            </div>
+            <div class="collapse-content" id="header-content">
+                <form action="{{ url_for('update_header') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="header-image">头部图片</label>
+                        <input type="file" id="header-image" name="image" accept="image/*">
+                        {% if header.image %}
+                        <div class="current-image">当前图片: <img src="{{ url_for('static', filename=header.image) }}" alt="头部图片" style="max-width: 100px;"></div>
+                        {% else %}
+                        <div class="no-image-text">暂无图片</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新头部图片</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 默认头像设置 -->
+        <div class="collapse-section">
+            <div class="collapse-header" onclick="toggleCollapse('settings')">
+                <h2>默认头像设置</h2>
+                <span class="collapse-icon" id="settings-icon">▼</span>
+            </div>
+            <div class="collapse-content" id="settings-content">
+                <form action="{{ url_for('update_default_avatar') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="default-avatar">默认头像</label>
+                        <input type="file" id="default-avatar" name="default_avatar" accept="image/*">
+                        {% if settings.default_avatar %}
+                        <div class="current-image">当前默认头像: <img src="{{ url_for('static', filename=settings.default_avatar) }}" alt="默认头像" style="max-width: 100px;"></div>
+                        {% else %}
+                        <div class="no-image-text">暂无默认头像</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn">更新默认头像</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+    <script>
+        // 折叠面板功能
+        function toggleCollapse(section) {
+            const content = document.getElementById(section + '-content');
+            const icon = document.getElementById(section + '-icon');
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+        
+        // 编辑表单切换
+        function toggleEditForm(itemId) {
+            const form = document.getElementById('edit-form-' + itemId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        // 捐赠表单切换
+        function toggleDonateForm(itemId) {
+            const form = document.getElementById('donate-form-' + itemId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        // 捐助记录编辑表单切换
+        function toggleDonationEditForm(donationId) {
+            const form = document.getElementById('donation-edit-form-' + donationId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        // 页面加载时，展开第一个面板
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从localStorage中获取上次打开的面板
+            const lastOpened = localStorage.getItem('lastOpenedSection');
+            if (lastOpened) {
+                toggleCollapse(lastOpened);
+            } else {
+                // 默认展开第一个面板
+                toggleCollapse('items');
+            }
+        });
+        
+        // 点击面板时，保存到localStorage
+        document.querySelectorAll('.collapse-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const section = this.getAttribute('onclick').match(/toggleCollapse\('(.*)'\)/)[1];
+                localStorage.setItem('lastOpenedSection', section);
+            });
+        });
+    </script>
+</body>
+</html>

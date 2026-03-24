@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>捐助记录 - 小行星青少年新空间捐助平台</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .donations-list {
             max-width: 800px;
@@ -119,60 +119,45 @@
     <header>
         <h1>小行星青少年新空间捐助平台</h1>
         <p>为青少年新空间贡献一份力量</p>
+        <!-- 用户信息区域 -->
+        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
+        </div>
     </header>
     <main>
         <div class="donations-list">
             <h2>捐助记录</h2>
-            
+            {% if donations %}
+            {% for donation in donations %}
             <div class="donation-item">
                 <div class="donation-header">
                     <div class="donor-avatar">
-                        <img src="static/images/donor_1.jpg" alt="张三">
+                        <img src="{{ url_for('static', filename=donation.donor_avatar if donation.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ donation.donor_name }}">
                     </div>
                     <div class="donor-info">
-                        <div class="donor-name">张三</div>
-                        <div class="donation-time">2024-01-15 14:30:00</div>
+                        <div class="donor-name">{{ donation.donor_name }}</div>
+                        <div class="donation-time">{{ donation.donation_time }}</div>
                     </div>
                 </div>
                 <div class="donation-content">
-                    <div class="item-name">文具套装</div>
-                    <div class="donation-message">希望孩子们好好学习，天天向上！</div>
+                    <div class="item-name">{{ donation.item_name }}</div>
+                    {% if donation.message %}
+                    <div class="donation-message">{{ donation.message }}</div>
+                    {% endif %}
                 </div>
             </div>
-            
-            <div class="donation-item">
-                <div class="donation-header">
-                    <div class="donor-avatar">
-                        <img src="static/images/donor_1.jpg" alt="好心人">
-                    </div>
-                    <div class="donor-info">
-                        <div class="donor-name">好心人</div>
-                        <div class="donation-time">2024-01-14 10:20:00</div>
-                    </div>
-                </div>
-                <div class="donation-content">
-                    <div class="item-name">书包</div>
-                    <div class="donation-message">匿名捐助，希望能帮助到需要的孩子。</div>
-                </div>
-            </div>
-            
-            <div class="donation-item">
-                <div class="donation-header">
-                    <div class="donor-avatar">
-                        <img src="static/images/donor_1.jpg" alt="李四">
-                    </div>
-                    <div class="donor-info">
-                        <div class="donor-name">李四</div>
-                        <div class="donation-time">2024-01-13 16:45:00</div>
-                    </div>
-                </div>
-                <div class="donation-content">
-                    <div class="item-name">篮球</div>
-                    <div class="donation-message">希望孩子们能有更多的运动器材。</div>
-                </div>
-            </div>
-            
-            <a href="index.html" class="btn">返回首页</a>
+            {% endfor %}
+            {% else %}
+            <div class="no-donations">暂无捐助记录</div>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn">返回首页</a>
         </div>
     </main>
     <footer>

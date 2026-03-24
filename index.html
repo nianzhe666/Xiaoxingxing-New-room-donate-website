@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小行星青少年新空间捐助平台</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         header {
-            background-color: #4CAF50;
+            {% if header.image %}
+            background-image: url('{{ url_for('static', filename=header.image) }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            {% endif %}
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
             position: relative;
@@ -66,6 +71,145 @@
             color: #333;
             margin-bottom: 20px;
             font-size: 24px;
+        }
+        
+        .donation-stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .donation-list h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .donation-items {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .donation-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .donation-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .donor-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .donation-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .donation-item-name {
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .donation-message {
+            font-size: 14px;
+            color: #999;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .no-donations {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+        }
+        
+        .latest-donor {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .latest-donor h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .latest-donor-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .donor-avatar {
+            margin-right: 20px;
+        }
+        
+        .donor-avatar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+        }
+        
+        .donor-details {
+            flex: 1;
+        }
+        
+        .donor-details .donor-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .donor-details .donor-item {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .donor-details .donor-message {
+            font-size: 14px;
+            color: #999;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
         }
         
         .donor-avatars {
@@ -167,6 +311,15 @@
                 padding: 15px;
             }
             
+            .donation-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                padding: 10px 0;
+            }
+            
             .items-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
@@ -195,6 +348,17 @@
                 width: 16px;
                 height: 16px;
                 font-size: 9px;
+            }
+            
+            .latest-donor-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .donor-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
             }
         }
         
@@ -225,7 +389,14 @@
         <p>为青少年新空间贡献一份力量</p>
         <!-- 用户信息区域 -->
         <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
-            <a href="login.html" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% if session.user %}
+            <a href="{{ url_for('settings') }}" style="display: inline-block;">
+                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
+            {% endif %}
         </div>
     </header>
     <main>
@@ -233,45 +404,27 @@
         <section class="donations">
             <h2>爱心捐助</h2>
             <!-- 爱心人士 -->
-            <div class="donor-avatars" onclick="window.location.href='donations.html'">
+            <div class="donor-avatars" onclick="window.location.href='{{ url_for('donations_list') }}'">
                 <h3>爱心人士</h3>
+                {% if sorted_donors %}
                 <div class="avatars-container" id="avatarsContainer">
                     <div class="avatars-row" id="avatarsRow">
+                        {% for donor_name, donor_info in sorted_donors %}
                         <div class="avatar-item">
                             <div class="avatar">
-                                <img src="static/images/donor_1.jpg" alt="好心人">
-                                <div class="donation-count">3</div>
+                                <img src="{{ url_for('static', filename=donor_info.avatar if donor_info.avatar else 'images/donor_1.jpg') }}" alt="{{ donor_name }}">
+                                {% if donor_info.count > 1 %}
+                                <div class="donation-count">{{ donor_info.count }}</div>
+                                {% endif %}
                             </div>
-                            <div class="avatar-name">好心人</div>
+                            <div class="avatar-name">{{ donor_name }}</div>
                         </div>
-                        <div class="avatar-item">
-                            <div class="avatar">
-                                <img src="static/images/donor_1.jpg" alt="张三">
-                                <div class="donation-count">2</div>
-                            </div>
-                            <div class="avatar-name">张三</div>
-                        </div>
-                        <div class="avatar-item">
-                            <div class="avatar">
-                                <img src="static/images/donor_1.jpg" alt="李四">
-                                <div class="donation-count">1</div>
-                            </div>
-                            <div class="avatar-name">李四</div>
-                        </div>
-                        <div class="avatar-item">
-                            <div class="avatar">
-                                <img src="static/images/donor_1.jpg" alt="王五">
-                            </div>
-                            <div class="avatar-name">王五</div>
-                        </div>
-                        <div class="avatar-item">
-                            <div class="avatar">
-                                <img src="static/images/donor_1.jpg" alt="赵六">
-                            </div>
-                            <div class="avatar-name">赵六</div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                {% else %}
+                <div class="no-donors">暂无捐助记录</div>
+                {% endif %}
                 <div class="view-all">点击查看全部捐助记录</div>
             </div>
         </section>
@@ -354,55 +507,39 @@
         <section class="items">
             <h2>需要捐助的物品</h2>
             <div class="items-grid">
+                {% for item in items %}
                 <div class="item-card">
                     <div class="item-image-container">
-                        <img src="static/images/donor_1.jpg" alt="书包">
+                        {% if item.image %}
+                        <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                        {% else %}
+                        <div class="no-image">暂无图片</div>
+                        {% endif %}
                         <div class="item-status">
-                            <span class="status-badge not-donated">待捐赠</span>
+                            <span class="status-badge {% if item.donated %}donated{% else %}not-donated{% endif %}">
+                                {% if item.donated %}已捐赠{% else %}待捐赠{% endif %}
+                            </span>
                         </div>
                     </div>
-                    <h3>书包</h3>
-                    <p class="price">价格: ¥100</p>
-                    <a href="item.html" class="btn">查看详情</a>
-                </div>
-                <div class="item-card">
-                    <div class="item-image-container">
-                        <img src="static/images/donor_1.jpg" alt="文具套装">
-                        <div class="item-status">
-                            <span class="status-badge donated">已捐赠</span>
-                        </div>
-                    </div>
-                    <h3>文具套装</h3>
-                    <p class="price">价格: ¥50</p>
+                    <h3>{{ item.name }}</h3>
+                    <p class="price">价格: ¥{{ item.price }}</p>
+                    {% if item.donated %}
                     <div class="donor-info-card">
-                        <img src="static/images/donor_1.jpg" alt="张三" class="donor-avatar-card">
-                        <p class="donor-name-card">捐助人: 张三</p>
-                        <p class="donation-message-small">希望孩子们好好学习，天天向上！</p>
+                        <img src="{{ url_for('static', filename=item.donor_avatar if item.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ item.donor_name }}" class="donor-avatar-card">
+                        <p class="donor-name-card">捐助人: {{ item.donor_name }}</p>
+                        {% for donation in donations %}
+                            {% if donation.item_id == item.id and donation.message %}
+                            <p class="donation-message-small">{{ donation.message }}</p>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <a href="item.html" class="btn">查看详情</a>
+                    {% endif %}
+                    <a href="{{ url_for('item_detail', item_id=item.id) }}" class="btn">查看详情</a>
                 </div>
-                <div class="item-card">
-                    <div class="item-image-container">
-                        <img src="static/images/donor_1.jpg" alt="篮球">
-                        <div class="item-status">
-                            <span class="status-badge not-donated">待捐赠</span>
-                        </div>
-                    </div>
-                    <h3>篮球</h3>
-                    <p class="price">价格: ¥150</p>
-                    <a href="item.html" class="btn">查看详情</a>
-                </div>
-                <div class="item-card">
-                    <div class="item-image-container">
-                        <img src="static/images/donor_1.jpg" alt="足球">
-                        <div class="item-status">
-                            <span class="status-badge not-donated">待捐赠</span>
-                        </div>
-                    </div>
-                    <h3>足球</h3>
-                    <p class="price">价格: ¥120</p>
-                    <a href="item.html" class="btn">查看详情</a>
-                </div>
+                {% endfor %}
+                {% if not items %}
+                <div class="no-items">暂无需要捐助的物品</div>
+                {% endif %}
             </div>
         </section>
     </main>
