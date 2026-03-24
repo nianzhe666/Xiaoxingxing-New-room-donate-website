@@ -12,8 +12,11 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
 # 配置数据库
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_CONFIG['SQLALCHEMY_DATABASE_URI']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = DATABASE_CONFIG['SQLALCHEMY_TRACK_MODIFICATIONS']
+import os
+# 从环境变量获取数据库连接信息
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///donate_website.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # 初始化数据库
 db.init_app(app)
