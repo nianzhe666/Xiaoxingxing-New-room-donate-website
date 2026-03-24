@@ -5,11 +5,6 @@ type = "pages"
 command = ""
 directory = "."
 
-[functions]
-[[functions]]
-path = "/*"
-handler = "functions/[[path]].js"
-
 [dev]
 command = ""
 
