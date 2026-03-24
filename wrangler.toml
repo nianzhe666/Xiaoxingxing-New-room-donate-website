@@ -1,0 +1,13 @@
+name = "xiaoxingxing-donate-website"
+type = "pages"
+
+[build]
+command = "pip install -r requirements.txt"
+directory = "."
+
+[dev]
+command = "python app.py"
+
+[env.production]
+SECRET_KEY = "your-secret-key-here"
+FLASK_ENV = "production"

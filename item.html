@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物品详情 - 小行星青少年新空间捐助平台</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .item-detail {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .item-detail h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .item-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .item-image {
+            flex: 0 0 300px;
+        }
+        
+        .item-image img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-details {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .item-details h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .item-details p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .anonymous-toggle {
+            margin: 20px 0;
+        }
+        
+        .anonymous-toggle label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .anonymous-toggle input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        
+        .anonymous-toggle .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 12px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .anonymous-toggle input[type="checkbox"]:checked + .toggle-switch {
+            background-color: #4CAF50;
+        }
+        
+        .anonymous-toggle .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .anonymous-toggle input[type="checkbox"]:checked + .toggle-switch::after {
+            transform: translateX(26px);
+        }
+        
+        .donor-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .donor-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .donor-details {
+            display: flex;
+            align-items: center;
+        }
+        
+        .donor-avatar {
+            margin-right: 20px;
+        }
+        
+        .donor-avatar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4CAF50;
+        }
+        
+        .donor-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .donation-message {
+            font-size: 14px;
+            color: #666;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .item-info {
+                flex-direction: column;
+            }
+            
+            .item-image {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>小行星青少年新空间捐助平台</h1>
+        <p>为青少年新空间贡献一份力量</p>
+    </header>
+    <main>
+        <div class="item-detail">
+            <h2>物品详情</h2>
+            <div class="item-info">
+                <div class="item-image">
+                    <img src="static/images/donor_1.jpg" alt="书包">
+                </div>
+                <div class="item-details">
+                    <h3>书包</h3>
+                    <p>描述: 优质耐用的双肩书包，适合小学生使用，有多个隔层，容量大，背负舒适。</p>
+                    <p>价格: ¥100</p>
+                    <div class="price">¥100</div>
+                    <div class="anonymous-toggle">
+                        <label>
+                            匿名捐助
+                            <input type="checkbox" id="anonymous">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+                    <button class="btn">微信支付</button>
+                    <a href="index.html" class="btn" style="background-color: #f44336;">返回</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2026 小行星</p>
+    </footer>
+</body>
+</html>
