@@ -12,4 +12,3 @@ command = ""
 [env.production]
 SECRET_KEY = "your-secret-key-here"
 FLASK_ENV = "production"
-PORT = "8080"
