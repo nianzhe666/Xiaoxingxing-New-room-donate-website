@@ -4,63 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小行星青少年新空间捐助平台</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        
         header {
-            {% if header.image %}
-            background-image: url('{{ url_for('static', filename=header.image) }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            {% endif %}
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            position: relative;
-        }
-        
-        .user-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .user-info span {
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
-        .btn.login-btn, .btn.logout-btn {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: white;
-        }
-        
-        .btn.login-btn {
             background-color: #4CAF50;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
         }
         
-        .btn.logout-btn {
-            background-color: #f44336;
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
         }
         
-        .btn.login-btn:hover {
-            background-color: #45a049;
-        }
-        
-        .btn.logout-btn:hover {
-            background-color: #da190b;
+        header p {
+            font-size: 16px;
         }
         
         main {
-            border-radius: 8px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 40px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .contact-btn {
+            background-color: #2196F3;
         }
         
         .donations {
@@ -71,145 +77,6 @@
             color: #333;
             margin-bottom: 20px;
             font-size: 24px;
-        }
-        
-        .donation-stats {
-            display: flex;
-            justify-content: space-around;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-number {
-            display: block;
-            font-size: 32px;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        
-        .stat-label {
-            display: block;
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .donation-list h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .donation-items {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        
-        .donation-item {
-            background-color: white;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .donation-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .donor-name {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .donation-time {
-            font-size: 12px;
-            color: #999;
-        }
-        
-        .donation-item-name {
-            color: #666;
-            margin-bottom: 8px;
-        }
-        
-        .donation-message {
-            font-size: 14px;
-            color: #999;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 5px;
-        }
-        
-        .no-donations {
-            text-align: center;
-            color: #999;
-            padding: 30px;
-        }
-        
-        .latest-donor {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .latest-donor h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .latest-donor-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .donor-avatar {
-            margin-right: 20px;
-        }
-        
-        .donor-avatar img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #4CAF50;
-        }
-        
-        .donor-details {
-            flex: 1;
-        }
-        
-        .donor-details .donor-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .donor-details .donor-item {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .donor-details .donor-message {
-            font-size: 14px;
-            color: #999;
-            background-color: #f5f5f5;
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 5px;
         }
         
         .donor-avatars {
@@ -231,10 +98,14 @@
             font-size: 16px;
         }
         
-        /* 桌面端布局 */
         .avatars-container {
             position: relative;
             margin-bottom: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
         
         .avatars-row {
@@ -244,8 +115,11 @@
         
         .avatar-item {
             text-align: center;
-            flex: 0 0 18%; /* 更紧凑的布局 */
+            flex: 0 0 18%;
             padding: 0 5px;
+            display: inline-block;
+            vertical-align: top;
+            box-sizing: border-box;
         }
         
         .avatar {
@@ -288,7 +162,6 @@
             width: 100%;
         }
         
-        /* 捐助次数标记 */
         .donation-count {
             position: absolute;
             top: -5px;
@@ -305,32 +178,182 @@
             font-weight: bold;
         }
         
-        /* 手机端布局 */
+        .items {
+            margin-top: 30px;
+        }
+        
+        .items h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .item-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 380px;
+        }
+        
+        .item-image-container {
+            position: relative;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        .item-image-container img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .item-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-badge.donated {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .status-badge.not-donated {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .no-image {
+            width: 100%;
+            height: 160px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #999;
+        }
+        
+        .item-card h3 {
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 16px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .price {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .donor-info-card {
+            margin: 6px 0 10px 0;
+            padding: 8px;
+            background-color: #f0f8f0;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .donor-avatar-card {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: contain;
+            background-color: #f0f0f0;
+            margin-bottom: 4px;
+        }
+        
+        .donor-name-card {
+            margin: 0 0 2px 0;
+            font-weight: bold;
+            color: #333;
+            font-size: 12px;
+        }
+        
+        .donation-message-small {
+            font-size: 11px;
+            color: #666;
+            margin: 4px 0 0 0;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            max-height: 40px;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .item-card .btn {
+            margin-top: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .item-card .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .no-items {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            grid-column: 1 / -1;
+        }
+        
         @media (max-width: 768px) {
             main {
                 padding: 15px;
             }
             
-            .donation-stats {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .stat-item {
-                padding: 10px 0;
-            }
-            
-            .items-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            
-            .item-card {
-                margin-bottom: 0;
-            }
-            
             .avatar-item {
-                flex: 0 0 25%; /* 4个头像一行 */
+                flex: 0 0 25%;
                 padding: 0 5px;
             }
             
@@ -350,36 +373,49 @@
                 font-size: 9px;
             }
             
-            .latest-donor-info {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
+            .items-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 0 8px;
             }
             
-            .donor-avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
+            .item-card {
+                padding: 10px;
+                max-height: 340px;
             }
-        }
-        
-        /* 滑动指示器 */
-        .scroll-indicator {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-        
-        .indicator-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #ddd;
-            margin: 0 4px;
-            transition: background-color 0.3s ease;
-        }
-        
-        .indicator-dot.active {
-            background-color: #4CAF50;
+            
+            .item-image-container img {
+                height: 140px;
+            }
+            
+            .no-image {
+                height: 140px;
+            }
+            
+            .item-card h3 {
+                font-size: 16px;
+            }
+            
+            .price {
+                font-size: 14px;
+            }
+            
+            .item-card .btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            header h1 {
+                font-size: 24px;
+            }
+            
+            main {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -387,164 +423,183 @@
     <header>
         <h1>小行星青少年新空间捐助平台</h1>
         <p>为青少年新空间贡献一份力量</p>
-        <!-- 用户信息区域 -->
-        <div class="user-info" id="userInfo" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 8px;">
-            {% if session.user %}
-            <a href="{{ url_for('settings') }}" style="display: inline-block;">
-                <img src="{{ url_for('static', filename=session.get('user_avatar', 'images/donor_1.jpg')) }}" alt="{{ session.user_name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; cursor: pointer;">
-            </a>
-            <a href="{{ url_for('logout') }}" class="btn logout-btn" style="font-size: 12px; padding: 4px 8px;">登出</a>
-            {% else %}
-            <a href="{{ url_for('login') }}" class="btn login-btn" style="font-size: 12px; padding: 4px 8px;">登录</a>
-            {% endif %}
-        </div>
     </header>
     <main>
         <!-- 爱心捐助 -->
         <section class="donations">
             <h2>爱心捐助</h2>
             <!-- 爱心人士 -->
-            <div class="donor-avatars" onclick="window.location.href='{{ url_for('donations_list') }}'">
+            <div class="donor-avatars" onclick="window.location.href='donations.html'">
                 <h3>爱心人士</h3>
-                {% if sorted_donors %}
                 <div class="avatars-container" id="avatarsContainer">
                     <div class="avatars-row" id="avatarsRow">
-                        {% for donor_name, donor_info in sorted_donors %}
                         <div class="avatar-item">
                             <div class="avatar">
-                                <img src="{{ url_for('static', filename=donor_info.avatar if donor_info.avatar else 'images/donor_1.jpg') }}" alt="{{ donor_name }}">
-                                {% if donor_info.count > 1 %}
-                                <div class="donation-count">{{ donor_info.count }}</div>
-                                {% endif %}
+                                <img src="static/images/donor_1.jpg" alt="好心人">
+                                <div class="donation-count">3</div>
                             </div>
-                            <div class="avatar-name">{{ donor_name }}</div>
+                            <div class="avatar-name">好心人</div>
                         </div>
-                        {% endfor %}
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="static/images/donor_1.jpg" alt="张三">
+                                <div class="donation-count">2</div>
+                            </div>
+                            <div class="avatar-name">张三</div>
+                        </div>
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="static/images/donor_1.jpg" alt="李四">
+                            </div>
+                            <div class="avatar-name">李四</div>
+                        </div>
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="static/images/donor_1.jpg" alt="王五">
+                            </div>
+                            <div class="avatar-name">王五</div>
+                        </div>
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="static/images/donor_1.jpg" alt="赵六">
+                            </div>
+                            <div class="avatar-name">赵六</div>
+                        </div>
+                        <div class="avatar-item">
+                            <div class="avatar">
+                                <img src="static/images/donor_1.jpg" alt="钱七">
+                            </div>
+                            <div class="avatar-name">钱七</div>
+                        </div>
                     </div>
                 </div>
-                {% else %}
-                <div class="no-donors">暂无捐助记录</div>
-                {% endif %}
                 <div class="view-all">点击查看全部捐助记录</div>
             </div>
         </section>
         
-        <script>
-            // 滑动功能实现
-            document.addEventListener('DOMContentLoaded', function() {
-                const container = document.getElementById('avatarsContainer');
-                const row = document.getElementById('avatarsRow');
-                
-                if (!container || !row) return;
-                
-                // 设置容器样式，启用滚动
-                container.style.overflowX = 'auto';
-                container.style.overflowY = 'hidden';
-                container.style.whiteSpace = 'nowrap';
-                container.style.scrollBehavior = 'smooth';
-                
-                // 移除默认滚动条
-                container.style::-webkit-scrollbar = 'none';
-                container.style.scrollbarWidth = 'none';
-                
-                // 调整头像项样式，使其在一行显示
-                const avatarItems = row.querySelectorAll('.avatar-item');
-                avatarItems.forEach(item => {
-                    item.style.display = 'inline-block';
-                    item.style.verticalAlign = 'top';
-                });
-                
-                // 触摸滑动优化
-                let isDown = false;
-                let startX;
-                let scrollLeft;
-                
-                container.addEventListener('mousedown', (e) => {
-                    isDown = true;
-                    container.classList.add('active');
-                    startX = e.pageX - container.offsetLeft;
-                    scrollLeft = container.scrollLeft;
-                });
-                
-                container.addEventListener('mouseleave', () => {
-                    isDown = false;
-                    container.classList.remove('active');
-                });
-                
-                container.addEventListener('mouseup', () => {
-                    isDown = false;
-                    container.classList.remove('active');
-                });
-                
-                container.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - container.offsetLeft;
-                    const walk = (x - startX) * 3; // 增加滚动速度
-                    container.scrollLeft = scrollLeft - walk;
-                });
-                
-                // 触摸设备支持
-                container.addEventListener('touchstart', (e) => {
-                    isDown = true;
-                    startX = e.touches[0].pageX - container.offsetLeft;
-                    scrollLeft = container.scrollLeft;
-                });
-                
-                container.addEventListener('touchend', () => {
-                    isDown = false;
-                });
-                
-                container.addEventListener('touchmove', (e) => {
-                    if (!isDown) return;
-                    const x = e.touches[0].pageX - container.offsetLeft;
-                    const walk = (x - startX) * 3; // 增加滚动速度
-                    container.scrollLeft = scrollLeft - walk;
-                });
-            });
-        </script>
-        
         <section class="items">
             <h2>需要捐助的物品</h2>
             <div class="items-grid">
-                {% for item in items %}
                 <div class="item-card">
                     <div class="item-image-container">
-                        {% if item.image %}
-                        <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
-                        {% else %}
-                        <div class="no-image">暂无图片</div>
-                        {% endif %}
+                        <img src="static/images/item_1.jpg" alt="学习用品">
                         <div class="item-status">
-                            <span class="status-badge {% if item.donated %}donated{% else %}not-donated{% endif %}">
-                                {% if item.donated %}已捐赠{% else %}待捐赠{% endif %}
-                            </span>
+                            <span class="status-badge not-donated">待捐赠</span>
                         </div>
                     </div>
-                    <h3>{{ item.name }}</h3>
-                    <p class="price">价格: ¥{{ item.price }}</p>
-                    {% if item.donated %}
-                    <div class="donor-info-card">
-                        <img src="{{ url_for('static', filename=item.donor_avatar if item.donor_avatar else 'images/donor_1.jpg') }}" alt="{{ item.donor_name }}" class="donor-avatar-card">
-                        <p class="donor-name-card">捐助人: {{ item.donor_name }}</p>
-                        {% for donation in donations %}
-                            {% if donation.item_id == item.id and donation.message %}
-                            <p class="donation-message-small">{{ donation.message }}</p>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    <a href="{{ url_for('item_detail', item_id=item.id) }}" class="btn">查看详情</a>
+                    <h3>学习用品</h3>
+                    <p class="price">价格: ¥100</p>
+                    <a href="#" class="btn">查看详情</a>
                 </div>
-                {% endfor %}
-                {% if not items %}
-                <div class="no-items">暂无需要捐助的物品</div>
-                {% endif %}
+                <div class="item-card">
+                    <div class="item-image-container">
+                        <img src="static/images/item_2.jpg" alt="体育器材">
+                        <div class="item-status">
+                            <span class="status-badge donated">已捐赠</span>
+                        </div>
+                    </div>
+                    <h3>体育器材</h3>
+                    <p class="price">价格: ¥200</p>
+                    <div class="donor-info-card">
+                        <img src="static/images/donor_1.jpg" alt="好心人" class="donor-avatar-card">
+                        <p class="donor-name-card">捐助人: 好心人</p>
+                        <p class="donation-message-small">希望这些器材能帮助孩子们更好地运动</p>
+                    </div>
+                    <a href="#" class="btn">查看详情</a>
+                </div>
             </div>
         </section>
     </main>
     <footer>
-        <p>&copy; 2026 小行星</p>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <button class="btn contact-btn" onclick="showContact()" style="background-color: #2196F3; margin: 0;">联系我们</button>
+            <p>&copy; 2026 小行星</p>
+        </div>
     </footer>
+    
+    <!-- 联系我们弹窗 -->
+    <div id="contact-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; position: relative;">
+            <span onclick="closeContact()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h3>联系我们</h3>
+            <p>暂未设置联系信息</p>
+        </div>
+    </div>
+    
+    <script>
+        // 滑动功能实现
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('avatarsContainer');
+            const row = document.getElementById('avatarsRow');
+            
+            if (!container || !row) return;
+            
+            // 触摸滑动优化
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                container.classList.add('active');
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+            
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+            
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 3; // 增加滚动速度
+                container.scrollLeft = scrollLeft - walk;
+            });
+            
+            // 触摸设备支持
+            container.addEventListener('touchstart', (e) => {
+                isDown = true;
+                startX = e.touches[0].pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+            
+            container.addEventListener('touchend', () => {
+                isDown = false;
+            });
+            
+            container.addEventListener('touchmove', (e) => {
+                if (!isDown) return;
+                const x = e.touches[0].pageX - container.offsetLeft;
+                const walk = (x - startX) * 3; // 增加滚动速度
+                container.scrollLeft = scrollLeft - walk;
+            });
+        });
+        
+        // 显示联系我们弹窗
+        function showContact() {
+            document.getElementById('contact-modal').style.display = 'block';
+        }
+        
+        // 关闭联系我们弹窗
+        function closeContact() {
+            document.getElementById('contact-modal').style.display = 'none';
+        }
+        
+        // 点击弹窗外部关闭
+        window.onclick = function(event) {
+            var contactModal = document.getElementById('contact-modal');
+            if (event.target == contactModal) {
+                contactModal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
