@@ -1,0 +1,37 @@
+{
+  "user1": {
+    "password": "123456",
+    "name": "小猫",
+    "avatar": "images/avatars/avatar_user1.jpg"
+  },
+  "user2": {
+    "password": "123456",
+    "name": "神秘人",
+    "avatar": "images/avatars/avatar_user2.jpg"
+  },
+  "Nianzhe": {
+    "password": "123456",
+    "name": "念哲",
+    "avatar": "images/avatars/avatar_nianzhe.jpg"
+  },
+  "Niko": {
+    "password": "123456",
+    "name": "Niko",
+    "avatar": "images/avatars/avatar_Niko.jpg"
+  },
+  "Zero": {
+    "password": "123456",
+    "name": "Zero",
+    "avatar": "images/avatars/avatar_Zero.jpg"
+  },
+  "Gray": {
+    "password": "12345",
+    "name": "Gray",
+    "avatar": "images/avatars/avatar_Gray.jpg"
+  },
+  "1": {
+    "password": "1",
+    "name": "1",
+    "avatar": "images/default_avatar.jpg"
+  }
+}

@@ -1,0 +1,37 @@
+database:
+  name: donate-db
+  plan: free
+  databaseName: donate_db
+  ipAllowList: []
+
+services:
+  - name: donate-web
+    plan: free
+    region: singapore
+    repo: https://github.com/nianzhe666/Xiaoxingxing-New-room-donate-website
+    branch: master
+    rootDir: ./
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WECHAT_MCHID
+        sync: false
+      - key: WECHAT_APPID
+        sync: false
+      - key: WECHAT_APIV3_KEY
+        sync: false
+      - key: WECHAT_PRIVATE_KEY_PATH
+        sync: false
+      - key: WECHAT_CERT_SERIAL_NO
+        sync: false
+      - key: WECHAT_NOTIFY_URL
+        sync: false
+      - key: MINIPROGRAM_APPID
+        sync: false
+      - key: MINIPROGRAM_APPSECRET
+        sync: false

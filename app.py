@@ -7,11 +7,33 @@ import time
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 
-# 模拟用户数据
-users = {
-    'user1': {'password': '123456', 'name': '张三', 'avatar': 'images/donor_1.jpg'},
-    'user2': {'password': '123456', 'name': '李四', 'avatar': 'images/donor_1.jpg'}
-}
+# 用户数据文件
+USERS_FILE = 'users.json'
+
+# 确保用户数据文件存在
+def ensure_users_file():
+    if not os.path.exists(USERS_FILE):
+        # 初始用户数据
+        initial_users = {
+            'user1': {'password': '123456', 'name': '张三', 'avatar': 'images/donor_1.jpg'},
+            'user2': {'password': '123456', 'name': '李四', 'avatar': 'images/donor_1.jpg'}
+        }
+        with open(USERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(initial_users, f, ensure_ascii=False, indent=2)
+
+# 加载用户数据
+def load_users():
+    ensure_users_file()
+    with open(USERS_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+# 保存用户数据
+def save_users(users_data):
+    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(users_data, f, ensure_ascii=False, indent=2)
+
+# 加载初始用户数据
+users = load_users()
 
 # 用户头像存储路径
 AVATAR_FOLDER = 'static/images/avatars'
@@ -298,7 +320,8 @@ def item_detail(item_id):
         return redirect(url_for('index'))
     contact = load_contact()
     header = load_header()
-    return render_template('item.html', item=item, contact=contact, header=header)
+    donations = load_donations()
+    return render_template('item.html', item=item, contact=contact, header=header, donations=donations)
 
 # 后台管理登录
 @app.route('/admin', methods=['GET', 'POST'])
@@ -781,6 +804,9 @@ def edit_user(username):
         avatar.save(avatar_path)
         users[username]['avatar'] = f"images/avatars/{avatar_filename}"
     
+    # 保存用户数据到文件
+    save_users(users)
+    
     return redirect(url_for('admin_users'))
 
 # 删除用户
@@ -791,6 +817,9 @@ def delete_user(username):
     
     if username in users:
         del users[username]
+    
+    # 保存用户数据到文件
+    save_users(users)
     
     return redirect(url_for('admin_users'))
 
@@ -812,6 +841,9 @@ def add_user():
             'name': name,
             'avatar': settings.get('default_avatar', 'images/donor_1.jpg')
         }
+        
+        # 保存用户数据到文件
+        save_users(users)
     
     return redirect(url_for('admin_users'))
 
@@ -865,6 +897,9 @@ def update_avatar():
         
         # 同步更新捐助人信息
         sync_donor_info(session['user'], new_avatar=new_avatar)
+        
+        # 保存用户数据到文件
+        save_users(users)
     
     return redirect(url_for('settings'))
 
@@ -882,6 +917,9 @@ def update_name():
         
         # 同步更新捐助人信息
         sync_donor_info(session['user'], new_name=new_name)
+        
+        # 保存用户数据到文件
+        save_users(users)
     
     return redirect(url_for('settings'))
 

@@ -107,7 +107,16 @@
                                 {% else %}
                                 <div class="no-avatar">暂无头像</div>
                                 {% endif %}
-                                <p class="donor-name">{{ item.donor_name }}</p>
+                                <div style="flex: 1;">
+                                    <p class="donor-name">{{ item.donor_name }}</p>
+                                    {% for donation in donations %}
+                                        {% if donation.item_id == item.id and donation.message %}
+                                        <div style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-size: 13px; color: #666; line-height: 1.4; margin-top: 8px; word-wrap: break-word; white-space: normal; max-width: 100%; overflow-wrap: break-word; word-break: break-all; hyphens: auto;">
+                                            {{ donation.message }}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>

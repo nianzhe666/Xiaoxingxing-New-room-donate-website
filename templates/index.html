@@ -218,6 +218,7 @@
             border-radius: 8px;
             cursor: pointer;
             transition: transform 0.3s ease;
+            position: relative;
         }
         
         .donor-avatars:hover {
@@ -235,6 +236,32 @@
         .avatars-container {
             position: relative;
             margin-bottom: 12px;
+            overflow: hidden;
+        }
+        
+        /* 渐隐效果 */
+        .avatars-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: linear-gradient(to right, #f9f9f9, transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .avatars-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: linear-gradient(to left, #f9f9f9, transparent);
+            pointer-events: none;
+            z-index: 1;
         }
         
         .avatars-row {
@@ -330,24 +357,24 @@
             }
             
             .avatar-item {
-                flex: 0 0 25%; /* 4个头像一行 */
-                padding: 0 5px;
+                flex: 0 0 20%; /* 5个头像一行 */
+                padding: 0 3px;
             }
             
             .avatar img {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
             }
             
             .avatar-name {
-                font-size: 10px;
-                margin-top: 4px;
+                font-size: 9px;
+                margin-top: 3px;
             }
             
             .donation-count {
-                width: 16px;
-                height: 16px;
-                font-size: 9px;
+                width: 14px;
+                height: 14px;
+                font-size: 8px;
             }
             
             .latest-donor-info {
@@ -359,6 +386,12 @@
             .donor-avatar {
                 margin-right: 0;
                 margin-bottom: 15px;
+            }
+            
+            /* 确保滑动容器在手机端正常工作 */
+            .avatars-container {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
             }
         }
         
@@ -404,7 +437,7 @@
         <section class="donations">
             <h2>爱心捐助</h2>
             <!-- 爱心人士 -->
-            <div class="donor-avatars" onclick="window.location.href='{{ url_for('donations_list') }}'">
+            <div class="donor-avatars">
                 <h3>爱心人士</h3>
                 {% if sorted_donors %}
                 <div class="avatars-container" id="avatarsContainer">
@@ -425,7 +458,7 @@
                 {% else %}
                 <div class="no-donors">暂无捐助记录</div>
                 {% endif %}
-                <div class="view-all">点击查看全部捐助记录</div>
+                <div class="view-all" onclick="window.location.href='{{ url_for('donations_list') }}'">点击查看全部捐助记录</div>
             </div>
         </section>
         
@@ -436,6 +469,9 @@
                 const row = document.getElementById('avatarsRow');
                 
                 if (!container || !row) return;
+                
+                // 检测设备类型
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 
                 // 设置容器样式，启用滚动
                 container.style.overflowX = 'auto';
@@ -501,6 +537,12 @@
                     const walk = (x - startX) * 3; // 增加滚动速度
                     container.scrollLeft = scrollLeft - walk;
                 });
+                
+                // 为移动设备添加额外的触摸优化
+                if (isMobile) {
+                    container.style.WebkitOverflowScrolling = 'touch';
+                    container.style.scrollSnapType = 'x mandatory';
+                }
             });
         </script>
         
@@ -529,7 +571,13 @@
                         <p class="donor-name-card">捐助人: {{ item.donor_name }}</p>
                         {% for donation in donations %}
                             {% if donation.item_id == item.id and donation.message %}
-                            <p class="donation-message-small">{{ donation.message }}</p>
+                            <p class="donation-message-small">
+                                {% if donation.message|length > 8 %}
+                                    {{ donation.message[:8] }}...
+                                {% else %}
+                                    {{ donation.message }}
+                                {% endif %}
+                            </p>
                             {% endif %}
                         {% endfor %}
                     </div>

@@ -316,6 +316,7 @@ footer {
     flex: 1;
     min-width: 300px;
     margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 .item-image img {
@@ -718,6 +719,43 @@ footer {
         width: 100%;
         text-align: center;
     }
+    
+    /* 物品详情页响应式 */
+    .item-content {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .item-image {
+        min-width: 100%;
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .item-info {
+        min-width: 100%;
+    }
+    
+    .item-image img {
+        max-width: 100%;
+        height: auto;
+        max-height: 300px;
+    }
+    
+    /* 弹窗响应式 */
+    .modal-content {
+        width: 90%;
+        max-width: 90%;
+        margin: 20% auto;
+        padding: 15px;
+    }
+    
+    .qrcode-image,
+    .contact-image {
+        max-width: 100%;
+        height: auto;
+        max-height: 250px;
+    }
 }
 
 @media (max-width: 360px) {
@@ -749,5 +787,27 @@ footer {
     .item-card .btn {
         font-size: 11px;
         padding: 5px 10px;
+    }
+    
+    /* 物品详情页响应式 */
+    .item-content {
+        padding: 10px;
+    }
+    
+    .item-image img {
+        max-height: 250px;
+    }
+    
+    /* 弹窗响应式 */
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 25% auto;
+        padding: 10px;
+    }
+    
+    .qrcode-image,
+    .contact-image {
+        max-height: 200px;
     }
 }
